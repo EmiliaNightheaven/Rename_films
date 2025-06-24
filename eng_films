@@ -1,0 +1,75 @@
+import requests
+
+films = [
+    'The.Matrix.1999.DVDRip.XviD.AC3-ZZTop',
+    'Interstelar.2014.1080p.BluRay.x264.YIFY',
+    'Avatar.2.2023.HDCAM.TS.MkvCage',
+    'Piratess.of.the.Carrabien.3.At.Wrolds.End.2007.DVDSCR',
+    'Lord.of.the.Rings.3.RETURN.OF.THE.KING[2003][Dual-Audio]',
+    'Jurrasic_World_Dominion.2022.HDRip.XviD.AAC-EVO',
+    'HarryPottr.5.And.the.Order.of.Phoenix[2007]R6.DVDRip',
+    'SpiderMan.No.Way.Hom3.2021.720p.WEB-DL.H264-RARBG',
+    'TheShawshenkRedemption.1994.720p.x264.YTS.AG',
+    'The.DarkKight.2008.1080p.BRRip.XviD.AC3-ViSiON',
+    'Fight.Club.1999.HQRip.DTS5.1.XviD.avi',
+    'Incepti0n_2010.BRRip.XviD-MAXSPEED',
+    'The.Godfathr.1972.REMASTERED.1080p.BluRay.x265.10bit',
+    'ForrestGimp.1994.720p.HDrip.XviD-JUGGS',
+    'Startrek.Into.Derpn3ss.2013.TS.XViD.AC3-SHiTTy',
+    'Iron.Man.3.2013.CAM.XviD.MP3-K3WLM0V13Z',
+    'The_Lion.King.1994.REPACK.720p.HDTV.X264-Kingdom',
+    'ToyStori_3.2010.1080p.Bluray.x264.SiLENT',
+    'Shrek.2.2004.HDTVRip.XviD.DUAL.AUDIO[Eng-Hin]',
+    'The.Hobbit_Battle.Of.Five.Armiez.2014.BDRip.XviD.AC3-EbP',
+]
+
+# Адрес LM Studio API, доступный из WSL 
+LM_STUDIO_URL = "http://192.168.0.123:1234/v1/chat/completions"
+
+
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer lm-studio"  # Требуется по умолчанию LM Studio
+}
+
+for film in films:
+    prompt = f'Dано искажённое название фильма: "{film}". Укажи правильное полное название этого фильма на английском. Просто название, без комментариев.'
+
+    response = requests.post(
+        LM_STUDIO_URL,
+        headers=headers,
+        json={
+            "model": "deepseek/deepseek-r1-0528-qwen3-8b",  # Название модели в LM Studio
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.3
+        }
+    )
+
+    result = response.json()
+    answer = result["choices"][0]["message"]["content"]
+    print(film, '|', answer)
+
+# | Изначальное название файла                                  | Название фильма на английском                        |
+# | ----------------------------------------------------------- | ---------------------------------------------------- |
+# | The.Matrix.1999.DVDRip.XviD.AC3-ZZTop                       | The Matrix                                           |
+# | Interstelar.2014.1080p.BluRay.x264.YIFY                     | Interstellar                                         |
+# | Avatar.2.2023.HDCAM.TS.MkvCage                              | Avatar: The Way of Water                             |
+# | Piratess.of.the.Carrabien.3.At.Wrolds.End.2007.DVDSCR       | Pirates of the Caribbean: At World's End             |
+# | Lord.of.the.Rings.3.RETURN.OF.THE.KING[2003][Dual-Audio]    | The Lord of the Rings: The Return of the King        |
+# | Jurrasic_World_Dominion.2022.HDRip.XviD.AAC-EVO             | Jurassic World Dominion                              |
+# | HarryPottr.5.And.the.Order.of.Phoenix[2007]R6.DVDRip        | Harry Potter and the Order of the Phoenix            |
+# | SpiderMan.No.Way.Hom3.2021.720p.WEB-DL.H264-RARBG           | Spider-Man: No Way Home                              |
+# | TheShawshenkRedemption.1994.720p.x264.YTS.AG                | The Shawshank Redemption                             |
+# | The.DarkKight.2008.1080p.BRRip.XviD.AC3-ViSiON              | The Dark Knight                                      |
+# | Fight.Club.1999.HQRip.DTS5.1.XviD.avi                       | Fight Club                                           |
+# | Incepti0n_2010.BRRip.XviD-MAXSPEED                          | Inception                                            |
+# | The.Godfathr.1972.REMASTERED.1080p.BluRay.x265.10bit        | The Godfather                                        |
+# | ForrestGimp.1994.720p.HDrip.XviD-JUGGS                      | The Silence of the Lambs                             | (ошибка)
+# | Startrek.Into.Derpn3ss.2013.TS.XViD.AC3-SHiTTy              | Star Trek: Into Darkness                             |
+# | Iron.Man.3.2013.CAM.XviD.MP3-K3WLM0V13Z                     | Iron Man 3                                           |
+# | The_Lion.King.1994.REPACK.720p.HDTV.X264-Kingdom            | The Lion King                                        |
+# | ToyStori_3.2010.1080p.Bluray.x264.SiLENT                    | Toy Story 3                                          |
+# | Shrek.2.2004.HDTVRip.XviD.DUAL.AUDIO[Eng-Hin]               | Shrek 2                                              |
+# | The.Hobbit_Battle.Of.Five.Armiez.2014.BDRip.XviD.AC3-EbP    | The Hobbit: The Battle of the Five Armies            |
