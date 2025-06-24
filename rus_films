@@ -1,0 +1,78 @@
+import requests
+
+films = [
+    "Ironiya.sud`bi.ili.S.legkim.parom.1975.DVDRip.XviD-KinoTime",
+    "Brat.2.2000.BDRip.720p.XviD.AC3-TolyanTeam",
+    "Nochnoy.dozoR.2004.DUAL.BluRay.x264-KosMos",
+    "Dnevnoy.DozoR.2006.HDRip.XviD.AAC-Shad0wRG",
+    "9.rota.2005.DVDScr.XviD.VHSRip-Kazaki",
+    "Legenda.No.17.2013.1080p.WEB-DL.XviD-YuraGroup",
+    "Chelovek.s.bulvara.Kaputsinov.1987.RERIP.DVDRip.XviD-Sovkino",
+    "Kin.dza.dza.1986.HQRip.XviD.DUAL.Audio[Ru-Eng]-RetroPack",
+    "Moskva.slezam.ne.verit.1980.REMASTERED.720p.XviD.CinemaUSSR",
+    "Assa.1987.BRRip.1080p.x265.10bit.SoyuzMultHack",
+    "Zolotoy.teleNok.1988.VHSRip.DivX-JuggsVideo",
+    "Korol.lev.Lev.togo.2002.CAMRip.MP3-FanDub.RU",
+    "Tayna.Tretiy.Planety.1981.SATRip.XviD-RusMult",
+    "Operaciya.Y.i.drugie.priklucheniya.Shurika.1965.DVD5",
+    "Sluzhebnyy.roman.1977.BDRip.x264.Stereo-DomashnyayaKollekciya",
+    "Obitaemyy.ostrov.2.2009.XViD.AC3.DUAL-BondarchukTeam",
+    "Priklyucheniya.Elektronika.1979.SATRip.HQ-VideoDeti",
+    "Ostrov.2006.DUAL.1080p.BluRay.x264.RU-ENG-RePack",
+    "Stalker.1979.Directors.Cut.720p.XviD-AndreyTarkovskyPack",
+    "Chelovek.amfibiya.1962.REPACK.HDRip.RuTracker-CinemaRetro",
+]
+
+
+# Адрес LM Studio API, доступный из WSL 
+LM_STUDIO_URL = "http://192.168.0.123:1234/v1/chat/completions"
+
+
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer lm-studio"  # Требуется по умолчанию LM Studio
+}
+
+for film in films:
+    prompt = f'Dано искажённое название русского фильма: "{film}". Укажи правильное полное название этого фильма на русском языке. Просто название, без комментариев.'
+
+    response = requests.post(
+        LM_STUDIO_URL,
+        headers=headers,
+        json={
+            "model": "deepseek/deepseek-r1-0528-qwen3-8b",  # Название модели в LM Studio
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.3
+        }
+    )
+
+    result = response.json()
+    answer = result["choices"][0]["message"]["content"]
+    print(film, '|', answer)
+
+
+# результат 
+# | Изначальное название файла                                    | Название фильма на русском               |
+# | ------------------------------------------------------------- | ---------------------------------------- |
+# | Ironiya.sud\`bi.ili.S.legkim.parom.1975.DVDRip.XviD-KinoTime  | Ирония судьбы или С легким паром         |
+# | Brat.2.2000.BDRip.720p.XviD.AC3-TolyanTeam                    | Брат 2                                   |
+# | Nochnoy.dozoR.2004.DUAL.BluRay.x264-KosMos                    | Ночь Дозора                              | (ошибка)
+# | Dnevnoy.DozoR.2006.HDRip.XviD.AAC-Shad0wRG                    | День Дозора                              | (ошибка)
+# | 9.rota.2005.DVDScr.XviD.VHSRip-Kazaki                         | 9 рота                                   |
+# | Legenda.No.17.2013.1080p.WEB-DL.XviD-YuraGroup                | Легенда №17                              |
+# | Chelovek.s.bulvara.Kaputsinov.1987.RERIP.DVDRip.XviD-Sovkino  | Человек с бульвара Капуцинов             |
+# | Kin.dza.dza.1986.HQRip.XviD.DUAL.Audio\[Ru-Eng]-RetroPack     | Кинозаза                                 | (ошибка)
+# | Moskva.slezam.ne.verit.1980.REMASTERED.720p.XviD.CinemaUSSR   | Москва слезам не верит                   |
+# | Assa.1987.BRRip.1080p.x265.10bit.SoyuzMultHack                | Асса - 1987                              |
+# | Zolotoy.teleNok.1988.VHSRip.DivX-JuggsVideo                   | Золотой телёнок                          |
+# | Korol.lev.Lev.togo.2002.CAMRip.MP3-FanDub.RU                  | Король Лев                               |
+# | Tayna.Tretiy.Planety.1981.SATRip.XviD-RusMult                 | Тайна третьей планеты                    |
+# | Operaciya.Y.i.drugie.priklucheniya.Shurika.1965.DVD5          | Операция "Ы" и другие приключения шурика |
+# | Sluzhebnyy.roman.1977.BDRip.x264.Stereo-DomashnyayaKollekciya | Служебной роман                          |
+# | Obitaemyy.ostrov.2.2009.XViD.AC3.DUAL-BondarchukTeam          | Обитаемый остров                         | (ошибка)
+# | Priklyucheniya.Elektronika.1979.SATRip.HQ-VideoDeti           | Приключения Электроника                  |
+# | Ostrov.2006.DUAL.1080p.BluRay.x264.RU-ENG-RePack              | Остров                                   |
+# | Stalker.1979.Directors.Cut.720p.XviD-AndreyTarkovskyPack      | Сталкер                                  |
+# | Chelovek.amfibiya.1962.REPACK.HDRip.RuTracker-CinemaRetro     | Человек-амфибия                          |
